@@ -11,10 +11,19 @@ var formatTime = today.getHours();
 var formatMinutes = today.getMinutes();
 
 var selectElementTwo = document.getElementById('time');
-if (formatTime <=12)
-    selectElementTwo.innerHTML = 'Time Loaded: '+formatTime%12+':'+formatMinutes+'am';
-if (formatTime >=13)
-    selectElementTwo.innerHTML = 'Time Loaded: '+formatTime%12+':'+formatMinutes+'pm';
+if (formatMinutes<10){
+    if (formatTime <=12)
+        selectElementTwo.innerHTML = 'Time Loaded: '+formatTime%12+':'+'0'+formatMinutes+'am';
+    if (formatTime >=13)
+        selectElementTwo.innerHTML = 'Time Loaded: '+formatTime%12+':'+'0'+formatMinutes+'pm';
+}
+else {
+    if (formatTime <=12)
+        selectElementTwo.innerHTML = 'Time Loaded: '+formatTime%12+':'+'0'+formatMinutes+'am';
+    if (formatTime >=13)
+        selectElementTwo.innerHTML = 'Time Loaded: '+formatTime%12+':'+'0'+formatMinutes+'pm';
+}
+
 
 document.getElementById('words').innerHTML = 'current activity on an average day:';
 
