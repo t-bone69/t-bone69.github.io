@@ -19,9 +19,9 @@ if (formatMinutes<10){
 }
 else {
     if (formatTime <=12)
-        selectElementTwo.innerHTML = 'Time Loaded: '+formatTime%12+':'+'0'+formatMinutes+'am';
+        selectElementTwo.innerHTML = 'Time Loaded: '+formatTime%12+':'+formatMinutes+'am';
     if (formatTime >=13)
-        selectElementTwo.innerHTML = 'Time Loaded: '+formatTime%12+':'+'0'+formatMinutes+'pm';
+        selectElementTwo.innerHTML = 'Time Loaded: '+formatTime%12+':'+formatMinutes+'pm';
 }
 
 
