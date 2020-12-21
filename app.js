@@ -1,106 +1,96 @@
-'use strict';
+let todoItems = [];
 
-console.log('Here\'s a hidden message');
+function renderTodo(todo) {
+  localStorage.setItem('todoItems', JSON.stringify(todoItems));
 
-var today = new Date();
-var formatDate = today.toDateString();
-var selectElementOne = document.getElementById('date');
-selectElementOne.innerHTML = 'Date: '+formatDate;
-var dayOfWeek = today.getDay();
-var formatTime = today.getHours();
-var formatMinutes = today.getMinutes();
+  const list = document.querySelector('.js-todo-list');
+  const item = document.querySelector(`[data-key='${todo.id}']`);
+  
+  if (todo.deleted) {
+    item.remove();
+    if (todoItems.length === 0) list.innerHTML = '';
+    return
+  }
 
-var selectElementTwo = document.getElementById('time');
-if (formatMinutes<10){
-    if (formatTime <=12)
-        selectElementTwo.innerHTML = 'Time Loaded: '+formatTime%12+':'+'0'+formatMinutes+'am';
-    if (formatTime >=13)
-        selectElementTwo.innerHTML = 'Time Loaded: '+formatTime%12+':'+'0'+formatMinutes+'pm';
-}
-else {
-    if (formatTime <=12)
-        selectElementTwo.innerHTML = 'Time Loaded: '+formatTime%12+':'+formatMinutes+'am';
-    if (formatTime >=13)
-        selectElementTwo.innerHTML = 'Time Loaded: '+formatTime%12+':'+formatMinutes+'pm';
+  const isChecked = todo.checked ? 'done': '';
+  const node = document.createElement("li");
+  node.setAttribute('class', `todo-item ${isChecked}`);
+  node.setAttribute('data-key', todo.id);
+  node.innerHTML = `
+    <input id="${todo.id}" type="checkbox"/>
+    <label for="${todo.id}" class="tick js-tick"></label>
+    <span>${todo.text}</span>
+    <button class="delete-todo js-delete-todo">
+    <svg><use href="#delete-icon"></use></svg>
+    </button>
+  `;
+
+  if (item) {
+    list.replaceChild(node, item);
+  } else {
+    list.append(node);
+  }
 }
 
+function addTodo(text) {
+  const todo = {
+    text,
+    checked: false,
+    id: Date.now(),
+  };
 
-document.getElementById('words').innerHTML = 'current activity on an average day:';
+  todoItems.push(todo);
+  renderTodo(todo);
+}
 
-if(dayOfWeek==1||dayOfWeek==2)
-    mondayTuesday();
-else if (dayOfWeek==4||dayOfWeek==5)
-    thursdayFriday();
-else if (dayOfWeek==3)
-    wednesdays();
-else if(dayOfWeek == 6)
-    saturdays();
-else if(dayOfWeek == 7)
-    sundays(); 
+function toggleDone(key) {
+  const index = todoItems.findIndex(item => item.id === Number(key));
+  todoItems[index].checked = !todoItems[index].checked;
+  renderTodo(todoItems[index]);
+}
 
-function mondayTuesday(){
-    if(formatTime>=2&&formatTime<=7)
-        document.getElementById('homework').innerHTML = 'sleeping';
-    else if(formatTime>=8&&formatTime<=15)
-        document.getElementById('homework').innerHTML = 'in zoom class';
-    else if(formatTime>=16&&formatTime<=18)
-        document.getElementById('homework').innerHTML = 'at soccer practice';
-    else if(formatTime==20)
-        document.getElementById('homework').innerHTML = 'eating dinner';
-    else if(formatTime==19||formatTime >20||formatTime==1)
-        document.getElementById('homework').innerHTML = '\"doing homework\"';
+function deleteTodo(key) {
+  const index = todoItems.findIndex(item => item.id === Number(key));
+  const todo = {
+    deleted: true,
+    ...todoItems[index]
+  };
+  todoItems = todoItems.filter(item => item.id !== Number(key));
+  renderTodo(todo);
 }
-function thursdayFriday(){
-    if(formatTime>=2&&formatTime<=7)
-        document.getElementById('homework').innerHTML = 'sleeping';
-    else if(formatTime>=8&&formatTime<=15)
-        document.getElementById('homework').innerHTML = 'at the school for classes';
-    else if(formatTime>=16&&formatTime<=18)
-        document.getElementById('homework').innerHTML = 'at soccer practice';
-    else if(formatTime>=19||formatTime==1)
-        document.getElementById('homework').innerHTML = '\"doing homework\"';
-}
-function saturdays(){
-    if (formatTime>=4&&formatTime<=12)
-        document.getElementById('homework').innerHTML = 'sleeping';
-    else if (formatTime==13)
-        document.getElementById('homework').innerHTML = 'eating food';
-    else if (formatTime>=14 && formatTime<=16)
-        document.getElementById('homework').innerHTML = 'playing in a soccer game';
-    else if (formatTime>=17 && formatTime<=19)
-        document.getElementById('homework').innerHTML = 'watching a movie';
-    else if (formatTime==20)
-        document.getElementById('homework').innerHTML = 'eating dinner';
-    else if (formatTime==21||formatTime==22)
-        document.getElementById('homework').innerHTML = 'watching youtube';
-    else if (formatTime>=23&&formatTime<=3)
-        document.getElementById('homework').innerHTML = 'wasting time';
-}
-function sundays(){
-    if (formatTime>=4&&formatTime<=12)
-        document.getElementById('homework').innerHTML = 'sleeping';
-    else if (formatTime==13)
-        document.getElementById('homework').innerHTML = 'eating food';
-    else if (formatTime>=14 && formatTime<=16)
-        document.getElementById('homework').innerHTML = 'reffing a soccer game';
-    else if (formatTime>=17 && formatTime<=19)
-        document.getElementById('homework').innerHTML = 'watching a movie';
-    else if (formatTime==20)
-        document.getElementById('homework').innerHTML = 'eating dinner';
-    else if (formatTime==21||formatTime==22)
-        document.getElementById('homework').innerHTML = 'watching youtube';
-    else if (formatTime>=23&&formatTime<=3)
-        document.getElementById('homework').innerHTML = 'wasting time';
-}
-function wednesdays(){
-    if (formatTime >=1&&formatTime<=7)
-        document.getElementById('homework').innerHTML = 'sleeping';
-    else if (formatTime>=8&&formatTime<=13)
-        document.getElementById('homework').innerHTML = 'in zoom class';
-    else if (formatTime>=14 && formatTime<=15)
-        document.getElementById('homework').innerHTML = 'taking a nap';
-    else if(formatTime>=16&&formatTime<=18)
-        document.getElementById('homework').innerHTML = 'at soccer practice';
-    else if(formatTime>=19||formatTime==1)
-        document.getElementById('homework').innerHTML = '\"doing homework\"';
-}
+
+const form = document.querySelector('.js-form');
+form.addEventListener('submit', event => {
+  event.preventDefault();
+  const input = document.querySelector('.js-todo-input');
+
+  const text = input.value.trim();
+  if (text !== '') {
+    addTodo(text);
+    input.value = '';
+    input.focus();
+  }
+});
+
+const list = document.querySelector('.js-todo-list');
+list.addEventListener('click', event => {
+  if (event.target.classList.contains('js-tick')) {
+    const itemKey = event.target.parentElement.dataset.key;
+    toggleDone(itemKey);
+  }
+  
+  if (event.target.classList.contains('js-delete-todo')) {
+    const itemKey = event.target.parentElement.dataset.key;
+    deleteTodo(itemKey);
+  }
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+  const ref = localStorage.getItem('todoItems');
+  if (ref) {
+    todoItems = JSON.parse(ref);
+    todoItems.forEach(t => {
+      renderTodo(t);
+    });
+  }
+});
